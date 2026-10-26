@@ -1,0 +1,40 @@
+name: Validate
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test-only-password
+          MYSQL_DATABASE: course_registration_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -ptest-only-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_mysql, pdo_sqlite
+          coverage: none
+      - run: find backend -name '*.php' -print0 | xargs -0 -n 1 php -l
+      - run: npm --prefix frontend ci
+      - run: npm --prefix frontend run build
+      - run: node tests/api.mjs
+        env:
+          TEST_DB_DSN: mysql:host=127.0.0.1;port=3306;dbname=course_registration_test;charset=utf8mb4
+          TEST_DB_USER: root
+          TEST_DB_PASSWORD: test-only-password
