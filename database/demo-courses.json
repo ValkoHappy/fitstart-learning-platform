@@ -1,0 +1,188 @@
+[
+  {
+    "id_course": 1,
+    "title": "Основы работы фитнес-тренера",
+    "description": "Анатомия, безопасная нагрузка и первые занятия с клиентом.",
+    "image_path": "/img/course_1778265850_69fe2efa5108b.png.webp",
+    "access_type": "free",
+    "is_active": 1,
+    "created_at": "2026-01-01 12:00:00",
+    "modules": [
+      {
+        "id_module": 10,
+        "id_course": 1,
+        "title": "Анатомия и безопасность",
+        "order_index": 0,
+        "lessons": [
+          {
+            "id_lesson": 101,
+            "id_module": 10,
+            "title": "Введение и основные принципы",
+            "type": "text",
+            "content": "Перед занятием уточните самочувствие клиента, опыт тренировок и ограничения. При боли и плохом самочувствии тренировку нужно остановить. Тренер не ставит диагнозы и не назначает лечение.",
+            "duration": "5 минут",
+            "order_index": 0,
+            "completion_policy": "manual"
+          },
+          {
+            "id_lesson": 102,
+            "id_module": 10,
+            "title": "Видео и конспект занятия",
+            "type": "video",
+            "content": "Перед занятием уточните самочувствие клиента, опыт тренировок и ограничения. При боли и плохом самочувствии тренировку нужно остановить. Тренер не ставит диагнозы и не назначает лечение.",
+            "video_provider": "rutube",
+            "video_ref": "8137ca8565f92d41484c39ede263b5b4",
+            "duration": "10 минут",
+            "order_index": 1,
+            "completion_policy": "manual"
+          },
+          {
+            "id_lesson": 103,
+            "id_module": 10,
+            "title": "Практическое задание",
+            "type": "task",
+            "content": "Составьте краткий план первой встречи с клиентом. Укажите три вопроса для уточнения цели и ограничений, а также критерии, по которым будете оценивать прогресс.",
+            "duration": "15 минут",
+            "order_index": 2,
+            "completion_policy": "assignment"
+          },
+          {
+            "id_lesson": 104,
+            "id_module": 10,
+            "title": "Проверка знаний",
+            "type": "quiz",
+            "pass_score": 70,
+            "content": "{\"questions\":[{\"id_question\":110,\"question\":\"Что сделать при острой боли во время упражнения?\",\"options\":[{\"id_option\":120,\"option_text\":\"Остановить упражнение и оценить состояние\",\"is_correct\":true},{\"id_option\":121,\"option_text\":\"Продолжать с тем же весом\",\"is_correct\":false},{\"id_option\":122,\"option_text\":\"Увеличить темп\",\"is_correct\":false}]}]}",
+            "duration": "3 минуты",
+            "order_index": 3,
+            "completion_policy": "quiz"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id_course": 2,
+    "title": "Планирование тренировок",
+    "description": "Цель, структура занятия и постепенное изменение нагрузки.",
+    "image_path": "/img/course_1778264884_69fe2b34986c5.png.webp",
+    "access_type": "free",
+    "is_active": 1,
+    "created_at": "2026-01-01 12:00:00",
+    "modules": [
+      {
+        "id_module": 20,
+        "id_course": 2,
+        "title": "Программа занятий",
+        "order_index": 0,
+        "lessons": [
+          {
+            "id_lesson": 201,
+            "id_module": 20,
+            "title": "Введение и основные принципы",
+            "type": "text",
+            "content": "Программу строят от цели и текущей подготовки. Начните с доступной нагрузки, отслеживайте технику, самочувствие и восстановление. Записывайте результаты, чтобы менять программу на основании наблюдений.",
+            "duration": "5 минут",
+            "order_index": 0,
+            "completion_policy": "manual"
+          },
+          {
+            "id_lesson": 202,
+            "id_module": 20,
+            "title": "Видео и конспект занятия",
+            "type": "video",
+            "content": "Программу строят от цели и текущей подготовки. Начните с доступной нагрузки, отслеживайте технику, самочувствие и восстановление. Записывайте результаты, чтобы менять программу на основании наблюдений.",
+            "video_provider": "rutube",
+            "video_ref": "7725f17d863d8db2ab92e7c90e536c59",
+            "duration": "10 минут",
+            "order_index": 1,
+            "completion_policy": "manual"
+          },
+          {
+            "id_lesson": 203,
+            "id_module": 20,
+            "title": "Практическое задание",
+            "type": "task",
+            "content": "Составьте краткий план первой встречи с клиентом. Укажите три вопроса для уточнения цели и ограничений, а также критерии, по которым будете оценивать прогресс.",
+            "duration": "15 минут",
+            "order_index": 2,
+            "completion_policy": "assignment"
+          },
+          {
+            "id_lesson": 204,
+            "id_module": 20,
+            "title": "Проверка знаний",
+            "type": "quiz",
+            "pass_score": 70,
+            "content": "{\"questions\":[{\"id_question\":210,\"question\":\"На что ориентироваться при выборе стартовой нагрузки?\",\"options\":[{\"id_option\":220,\"option_text\":\"На подготовку и самочувствие клиента\",\"is_correct\":true},{\"id_option\":221,\"option_text\":\"Только на результат другого человека\",\"is_correct\":false},{\"id_option\":222,\"option_text\":\"На максимальный доступный вес\",\"is_correct\":false}]}]}",
+            "duration": "3 минуты",
+            "order_index": 3,
+            "completion_policy": "quiz"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id_course": 3,
+    "title": "Работа с клиентом",
+    "description": "Первая консультация, постановка целей и обратная связь.",
+    "image_path": "/img/course_1778264873_69fe2b29ab2e1.png.webp",
+    "access_type": "free",
+    "is_active": 1,
+    "created_at": "2026-01-01 12:00:00",
+    "modules": [
+      {
+        "id_module": 30,
+        "id_course": 3,
+        "title": "Коммуникация",
+        "order_index": 0,
+        "lessons": [
+          {
+            "id_lesson": 301,
+            "id_module": 30,
+            "title": "Введение и основные принципы",
+            "type": "text",
+            "content": "На первой встрече обсудите цель, расписание, опыт и ожидания клиента. Сформулируйте понятные шаги и договоритесь, как отслеживать прогресс. Обратная связь должна быть конкретной и уважительной.",
+            "duration": "5 минут",
+            "order_index": 0,
+            "completion_policy": "manual"
+          },
+          {
+            "id_lesson": 302,
+            "id_module": 30,
+            "title": "Видео и конспект занятия",
+            "type": "video",
+            "content": "На первой встрече обсудите цель, расписание, опыт и ожидания клиента. Сформулируйте понятные шаги и договоритесь, как отслеживать прогресс. Обратная связь должна быть конкретной и уважительной.",
+            "video_provider": "rutube",
+            "video_ref": "24d99171adc47e1c65258430b4399967",
+            "duration": "10 минут",
+            "order_index": 1,
+            "completion_policy": "manual"
+          },
+          {
+            "id_lesson": 303,
+            "id_module": 30,
+            "title": "Практическое задание",
+            "type": "task",
+            "content": "Составьте краткий план первой встречи с клиентом. Укажите три вопроса для уточнения цели и ограничений, а также критерии, по которым будете оценивать прогресс.",
+            "duration": "15 минут",
+            "order_index": 2,
+            "completion_policy": "assignment"
+          },
+          {
+            "id_lesson": 304,
+            "id_module": 30,
+            "title": "Проверка знаний",
+            "type": "quiz",
+            "pass_score": 70,
+            "content": "{\"questions\":[{\"id_question\":310,\"question\":\"С чего начать первую консультацию?\",\"options\":[{\"id_option\":320,\"option_text\":\"Обсудить цель, опыт и ограничения\",\"is_correct\":true},{\"id_option\":321,\"option_text\":\"Обещать гарантированный результат за неделю\",\"is_correct\":false},{\"id_option\":322,\"option_text\":\"Сразу назначить максимальную нагрузку\",\"is_correct\":false}]}]}",
+            "duration": "3 минуты",
+            "order_index": 3,
+            "completion_policy": "quiz"
+          }
+        ]
+      }
+    ]
+  }
+]

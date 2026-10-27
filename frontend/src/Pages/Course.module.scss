@@ -1,0 +1,383 @@
+﻿.course {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 3vw, 2.5rem) 3rem;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 2rem;
+  align-items: end;
+  margin-bottom: 1.5rem;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  h1 {
+    margin: 0.45rem 0 0.85rem;
+    font-size: clamp(2rem, 3.6vw, 3.4rem);
+    line-height: 1;
+  }
+
+  p {
+    max-width: 780px;
+    color: var(--fg-2);
+    font-size: 1.08rem;
+    line-height: 1.7;
+  }
+}
+
+.eyebrow {
+  display: inline-flex;
+  color: var(--or-2);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.backBtn {
+  min-height: 42px;
+  padding: 0 0.95rem;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--fg-3);
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--line);
+
+  &:hover {
+    color: var(--or-2);
+    border-color: rgba(255, 106, 33, 0.32);
+    background: rgba(255, 106, 33, 0.08);
+  }
+}
+
+.heroActions {
+  margin-top: 1.6rem;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  min-height: 48px;
+  padding: 0 1.25rem;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--or-grad);
+  color: #fff;
+  font-weight: 900;
+}
+
+.secondaryBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--line);
+  color: var(--fg-2);
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.modal {
+  position: relative;
+  width: min(520px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--bg-card);
+  padding: 1.5rem;
+
+  h3 {
+    margin-bottom: 0.35rem;
+  }
+}
+
+.closeBtn {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--fg-1);
+  font-size: 1.2rem;
+}
+
+.modalLead {
+  color: var(--fg-2);
+  margin-bottom: 1rem;
+}
+
+.form {
+  display: grid;
+  gap: 0.9rem;
+
+  label {
+    display: grid;
+    gap: 0.4rem;
+    color: var(--fg-2);
+    font-size: 0.86rem;
+    font-weight: 800;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--fg-1);
+    padding: 0.8rem 0.9rem;
+  }
+}
+
+.submitBtn {
+  min-height: 46px;
+  border-radius: 14px;
+  background: var(--or-grad);
+  color: #fff;
+  font-weight: 900;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+
+  article {
+    min-width: 0;
+    padding: 1.1rem;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.045);
+  }
+
+  strong {
+    display: block;
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    font-size: 2rem;
+  }
+
+  span {
+    color: var(--fg-3);
+  }
+}
+
+.progressSection,
+.module,
+.error {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.progressSection {
+  padding: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-weight: 800;
+}
+
+.progressBar {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--or-grad);
+  border-radius: inherit;
+}
+
+.modules {
+  display: grid;
+  gap: 1rem;
+}
+
+.module {
+  overflow: hidden;
+}
+
+.moduleHeader {
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--line);
+
+  span {
+    color: var(--or-2);
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    margin-top: 0.25rem;
+  }
+
+  strong {
+    color: var(--fg-3);
+    font-size: 0.9rem;
+  }
+}
+
+.lessons {
+  display: grid;
+}
+
+.lesson {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: center;
+  text-align: left;
+  padding: 0.95rem 1.25rem;
+  color: var(--fg-1);
+  border-bottom: 1px solid var(--line);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &:hover {
+    background: rgba(255, 106, 33, 0.08);
+  }
+}
+
+.lesson.completed .lessonIcon {
+  background: rgba(73, 209, 125, 0.16);
+  color: var(--good);
+}
+
+.lesson.locked {
+  opacity: 0.58;
+}
+
+.lessonIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--or-2);
+  font-weight: 900;
+  font-size: 0.82rem;
+  letter-spacing: 0;
+}
+
+.lessonContent {
+  min-width: 0;
+
+  strong,
+  small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    margin-top: 0.2rem;
+    color: var(--fg-3);
+  }
+}
+
+.errorContainer {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error {
+  padding: 2rem;
+  max-width: 520px;
+  text-align: center;
+
+  h3 {
+    color: var(--bad);
+    margin-bottom: 0.7rem;
+  }
+
+  p {
+    color: var(--fg-2);
+    margin-bottom: 1.4rem;
+  }
+}
+
+@media (max-width: 1180px) {
+  .course {
+    width: 100%;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .summary {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+
+    article {
+      padding: 0.75rem 0.65rem;
+      border-radius: 14px;
+    }
+
+    strong {
+      font-size: clamp(1.45rem, 7vw, 1.9rem);
+      line-height: 1;
+    }
+
+    span {
+      display: block;
+      margin-top: 0.35rem;
+      font-size: 0.78rem;
+      line-height: 1.2;
+    }
+  }
+
+  .moduleHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

@@ -1,277 +1,84 @@
-import assert from "node:assert/strict";
-import { spawn, spawnSync } from "node:child_process";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import path from "node:path";
-import net from "node:net";
-
-const root = path.resolve(import.meta.dirname, "..");
-const php = process.env.PHP_BINARY || "php";
-const temp = await mkdtemp(path.join(tmpdir(), "course-api-test-"));
-const mysqlDsn = process.env.TEST_DB_DSN;
-if (mysqlDsn && !/dbname=course_registration_test(?:;|$)/.test(mysqlDsn))
-  throw new Error("Use an isolated course_registration_test database");
-const env = {
-  ...process.env,
-  DB_DSN: mysqlDsn || "sqlite:" + path.join(temp, "test.db"),
-  DB_USER: process.env.TEST_DB_USER || "",
-  DB_PASSWORD: process.env.TEST_DB_PASSWORD || "",
-  FRONTEND_ORIGIN: "http://127.0.0.1:3000",
-};
-const execute = (code, args = [], extraEnv = {}) => {
-  const result = spawnSync(php, ["-r", code, ...args], {
-    cwd: root,
-    env: { ...env, ...extraEnv },
-    encoding: "utf8",
-  });
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-};
-const schema = mysqlDsn
-  ? (await readFile(path.join(root, "database/init.sql"), "utf8")).replace(
-      /CREATE DATABASE[^;]+;|USE course_registration;/g,
-      "",
-    )
-  : await readFile(path.join(root, "tests/schema.sqlite.sql"), "utf8");
-execute(
-  '$db=new PDO(getenv("DB_DSN"),getenv("DB_USER"),getenv("DB_PASSWORD"));$db->exec($argv[1]);',
-  [schema],
-);
-const admin = spawnSync(php, ["backend/bin/create-admin.php"], {
-  cwd: root,
-  env: {
-    ...env,
-    ADMIN_LOGIN: "test-admin",
-    ADMIN_EMAIL: "admin@example.test",
-    ADMIN_PASSWORD: "TestOnly!98765",
-  },
-  encoding: "utf8",
-});
-assert.equal(admin.status, 0, admin.stderr || admin.stdout);
-const listener = net.createServer();
-await new Promise((resolve) => listener.listen(0, "127.0.0.1", resolve));
-const port = listener.address().port;
-await new Promise((resolve) => listener.close(resolve));
-const base = "http://127.0.0.1:" + port;
-const server = spawn(php, ["-S", "127.0.0.1:" + port, "backend/router.php"], {
-  cwd: root,
-  env,
-  stdio: ["ignore", "ignore", "pipe"],
-});
-let serverLog = "";
-server.stderr.on("data", (chunk) => {
-  serverLog += chunk.toString();
-});
-class Client {
-  cookie = "";
-  csrf = "";
-  async call(
-    route,
-    {
-      method = "GET",
-      data,
-      expected = 200,
-      csrf = true,
-      headers = {},
-      raw,
-    } = {},
-  ) {
-    const response = await fetch(base + route, {
-      method,
-      headers: {
-        ...(this.cookie ? { Cookie: this.cookie } : {}),
-        ...(data !== undefined || raw !== undefined
-          ? { "Content-Type": "application/json" }
-          : {}),
-        ...(method !== "GET" && csrf ? { "X-CSRF-Token": this.csrf } : {}),
-        ...headers,
-      },
-      body: raw ?? (data === undefined ? undefined : JSON.stringify(data)),
-    });
-    const cookie = response.headers.get("set-cookie");
-    if (cookie) this.cookie = cookie.split(";")[0];
-    assert.equal(
-      response.status,
-      expected,
-      route + " returned " + response.status,
-    );
-    const body = await response.json();
-    if (body.csrfToken) this.csrf = body.csrfToken;
-    return body;
-  }
-  async login(login, password) {
-    await this.call("/api/auth.php");
-    return this.call("/api/auth.php?action=login", {
-      method: "POST",
-      data: { login, password },
-    });
-  }
+import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { randomUUID } from 'node:crypto';
+const base = process.env.API_TEST_URL || 'http://127.0.0.1:8018/api/';
+const stamp = Date.now();
+let checks = 0;
+function check(value, message) { assert.ok(value, message); checks++; }
+function session() {
+ let cookie = '', token;
+ return async function request(action, data, options = {}) {
+  const headers = { Cookie: cookie };
+  if (data !== undefined && !token && options.csrf !== false) { const seed = await fetch(base + '?action=csrf', {headers}); cookie = seed.headers.get('set-cookie')?.split(';')[0] || cookie; token = (await seed.json()).token; headers.Cookie = cookie; }
+  if (data !== undefined) { if (!(data instanceof FormData)) headers['Content-Type'] = 'application/json'; if (options.csrf !== false) headers['X-CSRF-Token'] = token; }
+  if (options.origin) headers.Origin = options.origin;
+  const response = await fetch(base + '?action=' + action, {method:data === undefined?'GET':'POST',headers,body:data===undefined?undefined:(data instanceof FormData?data:JSON.stringify(data))});
+  cookie = response.headers.get('set-cookie')?.split(';')[0] || cookie;
+  const text = await response.text();
+  let body; try { body = JSON.parse(text); } catch { throw new Error(action + " returned invalid JSON: " + text.slice(0,900)); }
+  if (action === 'logout') token = undefined;
+  return {status:response.status,body};
+ };
 }
-try {
-  let ready = false;
-  for (let i = 0; i < 60; i++) {
-    try {
-      await fetch(base + "/api/auth.php");
-      ready = true;
-      break;
-    } catch {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-  }
-  assert(ready, "PHP server failed to start");
-  const user = new Client(),
-    other = new Client(),
-    operator = new Client();
-  assert.equal((await user.call("/api/auth.php")).authenticated, false);
-  await user.call("/api/applications.php", { expected: 401 });
-  await user.call("/api/auth.php?action=register", {
-    method: "POST",
-    data: {},
-    csrf: false,
-    expected: 403,
-  });
-  await user.call("/api/auth.php?action=register", {
-    method: "POST",
-    raw: "{",
-    expected: 400,
-  });
-  await user.call("/api/auth.php?action=register", {
-    method: "POST",
-    data: [],
-    expected: 400,
-  });
-  await user.call("/api/auth.php?action=register", {
-    method: "POST",
-    data: { login: [], email: "a@example.test", password: "TestPass!123" },
-    expected: 400,
-  });
-  await user.call("/api/auth.php?action=register", {
-    method: "POST",
-    data: { login: "test-user", email: "bad-email", password: "TestPass!123" },
-    expected: 400,
-  });
-  await user.call("/api/auth.php?action=register", {
-    method: "POST",
-    data: { login: "test-user", email: "user@example.test", password: "short" },
-    expected: 400,
-  });
-  await user.call("/api/auth.php?action=register", {
-    method: "POST",
-    data: {
-      login: "test-user",
-      email: "user@example.test",
-      password: " TestPass!123 ",
-      role: "admin",
-    },
-    expected: 201,
-  });
-  await user.call("/api/auth.php?action=register", {
-    method: "POST",
-    data: {
-      login: "test-user",
-      email: "another@example.test",
-      password: "TestPass!123",
-    },
-    expected: 409,
-  });
-  await user.call("/api/auth.php?action=login", {
-    method: "POST",
-    data: { login: "test-user", password: "TestPass!123" },
-    expected: 401,
-  });
-  const oldCookie = user.cookie;
-  const loggedIn = await user.login("test-user", " TestPass!123 ");
-  assert.equal(loggedIn.user.role, "user");
-  assert(!("password_hash" in loggedIn.user));
-  assert.notEqual(oldCookie, user.cookie);
-  const application = await user.call("/api/applications.php", {
-    method: "POST",
-    data: { comment: "Course request" },
-    expected: 201,
-  });
-  await user.call("/api/applications.php", {
-    method: "POST",
-    data: {},
-    expected: 409,
-  });
-  await user.call("/api/applications.php", {
-    method: "PATCH",
-    data: { id: application.application_id, status: "approved" },
-    expected: 403,
-  });
-  await other.call("/api/auth.php");
-  await other.call("/api/auth.php?action=register", {
-    method: "POST",
-    data: {
-      login: "other-user",
-      email: "other@example.test",
-      password: "OtherPass!123",
-    },
-    expected: 201,
-  });
-  await other.login("other-user", "OtherPass!123");
-  assert.equal(
-    (await other.call("/api/applications.php?user_id=" + loggedIn.user.id))
-      .applications.length,
-    0,
-  );
-  await operator.login("test-admin", "TestOnly!98765");
-  const adminRows = (await operator.call("/api/applications.php?search=Course"))
-    .applications;
-  assert.equal(adminRows.length, 1);
-  assert.equal(adminRows[0].login, "test-user");
-  await operator.call("/api/applications.php", {
-    method: "PATCH",
-    data: { id: application.application_id, status: "wrong" },
-    expected: 400,
-  });
-  await operator.call("/api/applications.php", {
-    method: "PATCH",
-    data: { id: 99999, status: "approved" },
-    expected: 404,
-  });
-  await operator.call("/api/applications.php", {
-    method: "PATCH",
-    data: { id: application.application_id, status: "approved" },
-  });
-  await operator.call("/api/applications.php", {
-    method: "PATCH",
-    data: { id: application.application_id, status: "approved" },
-  });
-  const pending = await user.call("/api/applications.php", {
-    method: "POST",
-    data: {},
-    expected: 201,
-  });
-  await operator.call("/api/applications.php", {
-    method: "PATCH",
-    data: { id: application.application_id, status: "pending" },
-    expected: 409,
-  });
-  assert.equal(
-    (await operator.call("/api/applications.php?status=pending"))
-      .applications[0].id,
-    pending.application_id,
-  );
-  await user.call("/api/auth.php", {
-    headers: { Origin: "https://untrusted.example" },
-    expected: 403,
-  });
-  await user.call("/backend/bootstrap.php", { expected: 404 });
-  await user.call("/api/auth.php?action=logout", { method: "POST", data: {} });
-  assert.equal((await user.call("/api/auth.php")).authenticated, false);
-  await user.call("/api/applications.php", { expected: 401 });
-  assert(
-    !/Fatal error|PHP Warning|PHP Notice|Course API:/.test(serverLog),
-    serverLog,
-  );
-  console.log(
-    "API integration checks passed (" + (mysqlDsn ? "MySQL" : "SQLite") + ")",
-  );
-} finally {
-  server.kill();
-  await new Promise((resolve) => {
-    if (server.exitCode !== null) resolve();
-    else server.once("exit", resolve);
-  });
-  await rm(temp, { recursive: true, force: true });
-}
+const guest = session();
+check((await guest('getCourses')).body.length === 3, 'three courses');
+check(!(await guest('getUsers')).body.success, 'guest cannot list users');
+check((await guest('login', {login:'x',password:'x'}, {csrf:false})).status === 419, 'CSRF rejection');
+check((await guest('getCourses', undefined, {origin:'https://untrusted.example'})).status === 403, 'origin rejected');
+check((await guest('deleteUser')).status === 405, 'GET cannot delete users');
+const student = session(), login = 'student_' + stamp, password = 'StrongPass123!';
+check((await student('register',{login,password,first_name:'Иван',last_name:'Петров',email:login+'@example.com'})).body.success,'registration');
+check((await student('login',{login,password})).body.authenticated,'login');
+check((await student('check_auth')).body.user.role === 'student','student role');
+check(!(await student('getUsers')).body.success,'student cannot list users');
+check(!(await student('createCourse',{title:'Not allowed'})).body.success,'student cannot create course');
+check((await student('getCourse&id=1')).body.has_access,'free course access');
+const modules = (await student('getCourseContent&id=1')).body.modules;
+check(modules.length === 1 && modules[0].lessons.length === 4,'course content');
+check((await student('completeLesson',{lesson_id:101})).body.success,'complete text');
+check((await student('completeLesson',{lesson_id:102})).body.success,'complete video');
+check(!(await student('completeLesson',{lesson_id:104})).body.success,'cannot bypass quiz');
+check(!(await student('submitQuiz',{lesson_id:104,answers:{110:[121]}})).body.passed,'wrong answer fails');
+check((await student('submitQuiz',{lesson_id:104,answers:{110:[120]}})).body.passed,'correct answer passes');
+check((await student('getCourseContent&id=1')).body.modules[0].lessons.find(l=>l.id_lesson===104).quiz_passed,'quiz persisted');
+check((await student('requestPasswordReset',{email:'invalid'})).body.success === false,'invalid reset email rejected');
+check((await student('logout',{})).body.success,'logout');
+check(!(await student('check_auth')).body.authenticated,'session cleared');
+const php = process.env.PHP_BIN || 'php';
+const args = JSON.parse(process.env.PHP_ARGS || '[]');
+const adminLogin = 'admin_' + stamp, adminPassword = randomUUID();
+const setup = spawnSync(php, [...args, fileURLToPath(new URL('./create-admin.php', import.meta.url))], { env: { ...process.env, ADMIN_LOGIN:adminLogin, ADMIN_EMAIL:adminLogin+'@example.com', ADMIN_PASSWORD:adminPassword }, encoding:'utf8' });
+check(setup.status === 0, 'test administrator fixture: ' + setup.stderr);
+const admin = session();
+check((await admin('login',{login:adminLogin,password:adminPassword})).body.user.role === 'admin','admin login');
+const form = new FormData(); form.set('title','Integration course'); form.set('description','Test'); form.set('access_type','application');
+const created = (await admin('createCourse',form)).body;
+check(created.success && created.id,'admin creates course');
+const module = (await admin('createModule',{course_id:created.id,title:'Module'})).body;
+check(module.success,'admin creates module');
+const lesson = (await admin('createLesson',{module_id:module.id_module,title:'Lesson',type:'text',content:'Test content'})).body;
+check(lesson.success,'admin creates lesson');
+check((await admin('updateModule',{id_module:module.id_module,title:'Updated module'})).body.success,'module update');
+check((await admin('reorderModules',{modules:[module.id_module]})).body.success,'module ordering');
+check((await admin('reorderLessons',{lessons:[lesson.id_lesson]})).body.success,'lesson ordering');
+const fakeImage = new FormData(); fakeImage.set('title','Invalid image'); fakeImage.set('image', new Blob(['<?php echo 1; ?>'],{type:'image/jpeg'}),'fake.jpg');
+check((await admin('createCourse',fakeImage)).status === 400,'reject disguised image');
+check((await student('login',{login,password})).body.authenticated,'student signs in again');
+const application = (await student('createApplication',{id_course:created.id,full_name:'Иван Петров',email:login+'@example.com',phone:''})).body;
+check(application.success,'course application');
+check((await admin('updateApplicationStatus',{id_application:application.application_id,id_status:3})).body.success,'approve application');
+check((await student('getCourse&id='+created.id)).body.has_access,'approval grants access');
+const task = new FormData(); task.set('lesson_id','103'); task.set('answer_text','План первой встречи с клиентом');
+check((await student('submitAssignment',task)).body.success,'submit assignment');
+const queue = (await admin('getReviewQueue')).body.items;
+const studentId = (await student('check_auth')).body.user.id;
+const submission = queue.find(item=>Number(item.id_user) === Number(studentId));
+check(submission,'submission in review queue');
+check((await admin('reviewSubmission',{submission_id:submission.id_submission,status:'accepted',comment:'Принято'})).body.success,'review assignment');
+check((await student('getCourseContent&id=1')).body.modules[0].lessons.find(item=>item.id_lesson===103).submission_status === 'accepted','review saved');
+check((await admin('deleteLesson',{id_lesson:lesson.id_lesson})).body.success,'delete lesson');
+check((await admin('deleteModule',{id_module:module.id_module})).body.success,'delete module');
+const removeCourse = new FormData(); removeCourse.set('id',created.id);
+check((await admin('deleteCourse',removeCourse)).body.success,'delete test course');
+console.log('API integration: '+checks+' checks passed');

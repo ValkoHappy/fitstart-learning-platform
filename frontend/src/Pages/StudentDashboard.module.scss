@@ -1,0 +1,448 @@
+.page {
+  width: min(1360px, calc(100vw - var(--sidebar-w) - 3rem));
+  margin: 0 auto;
+  padding-bottom: 3rem;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, auto);
+  gap: 1.5rem;
+  align-items: start;
+  margin-bottom: clamp(1.45rem, 2.4vw, 2rem);
+
+  p {
+    color: var(--or-2);
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+  }
+
+  h1 {
+    margin-top: 0.35rem;
+    max-width: 760px;
+    font-size: clamp(1.9rem, 3vw, 2.8rem);
+    line-height: 1;
+  }
+
+  span {
+    display: block;
+    margin-top: 0.7rem;
+    color: var(--fg-2);
+  }
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+
+  article {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.045);
+    min-width: 0;
+    padding: 0.9rem;
+  }
+
+  strong {
+    display: block;
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    font-size: 1.55rem;
+  }
+
+  span {
+    color: var(--fg-3);
+    font-size: 0.78rem;
+  }
+}
+
+.nextActions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(220px, 0.8fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  article {
+    min-width: 0;
+    padding: 1.15rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+  }
+
+  span {
+    color: var(--or-2);
+    font-size: 0.76rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  h2,
+  h3 {
+    margin-top: 0.35rem;
+    line-height: 1.1;
+  }
+
+  p {
+    margin: 0.65rem 0 1rem;
+    color: var(--fg-2);
+    line-height: 1.5;
+  }
+
+  a {
+    margin-top: auto;
+    min-height: 42px;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0 0.95rem;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--or-2);
+    font-weight: 900;
+    background: rgba(255, 106, 33, 0.12);
+    border: 1px solid rgba(255, 106, 33, 0.22);
+  }
+}
+
+.primaryAction {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 106, 33, 0.13),
+    rgba(255, 255, 255, 0.045)
+  ) !important;
+  border-color: rgba(255, 106, 33, 0.24) !important;
+
+  a {
+    color: #fff;
+    background: var(--or-grad);
+    border-color: transparent;
+    box-shadow: 0 14px 28px rgba(255, 106, 33, 0.18);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.coursePanel,
+.applications,
+.empty {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--line);
+}
+
+.coursePanel {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  > div:not(.courseCover):not(.progressBar) {
+    min-width: 0;
+    padding: 1.25rem 1.25rem 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  > div > span {
+    order: 3;
+    color: var(--fg-3);
+    font-weight: 700;
+    font-size: 0.86rem;
+    margin-top: auto;
+  }
+
+  h2 {
+    order: 1;
+    margin: 0.35rem 0 0.45rem;
+    font-size: clamp(1.25rem, 1.6vw, 1.55rem);
+    line-height: 1.08;
+  }
+
+  p {
+    order: 2;
+    color: var(--fg-2);
+    line-height: 1.45;
+    max-width: 860px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 4.35em;
+  }
+
+  a {
+    align-self: flex-start;
+    justify-self: start;
+    margin: 0 1.25rem 1.25rem;
+    min-height: 44px;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0 1rem;
+    border-radius: 14px;
+    background: var(--or-grad);
+    color: #fff;
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    box-shadow: 0 14px 28px rgba(255, 106, 33, 0.2);
+  }
+}
+
+.courseCover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+  height: auto;
+  background: rgba(255, 255, 255, 0.06);
+  border-right: 0;
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0) 68%,
+      rgba(0, 0, 0, 0.22) 100%
+    );
+    pointer-events: none;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    object-position: center;
+    background: transparent;
+  }
+}
+
+.courseCoverFallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--or-2);
+  font-family: "Syne", sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  background:
+    linear-gradient(135deg, rgba(255, 106, 33, 0.2), rgba(255, 255, 255, 0.04)),
+    rgba(255, 255, 255, 0.04);
+}
+
+.progressBar {
+  margin: 0.5rem 1.25rem 1rem;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--or-grad);
+  }
+}
+
+.empty {
+  padding: 1.5rem;
+
+  p {
+    color: var(--fg-2);
+    margin: 0.7rem 0 1rem;
+  }
+
+  a {
+    min-height: 42px;
+    padding: 0 0.95rem;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--or-2);
+    font-weight: 900;
+    background: rgba(255, 106, 33, 0.12);
+    border: 1px solid rgba(255, 106, 33, 0.2);
+  }
+}
+
+.applications {
+  margin-top: 1rem;
+  padding: 1.25rem;
+
+  > p {
+    margin-top: 0.75rem;
+    color: var(--fg-2);
+  }
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+
+  a {
+    min-height: 42px;
+    padding: 0 0.95rem;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--or-2);
+    font-weight: 900;
+    background: rgba(255, 106, 33, 0.12);
+    border: 1px solid rgba(255, 106, 33, 0.2);
+  }
+}
+
+.applicationRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--line);
+
+  &:first-of-type {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  strong,
+  span {
+    display: block;
+  }
+
+  span {
+    color: var(--fg-3);
+    font-size: 0.86rem;
+  }
+
+  b {
+    color: var(--or-2);
+  }
+}
+
+.applicationStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  a {
+    min-height: 34px;
+    padding: 0 0.75rem;
+    border-radius: 999px;
+    background: rgba(255, 106, 33, 0.12);
+    color: var(--or-2);
+    font-size: 0.84rem;
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+@media (max-width: 1180px) {
+  .page {
+    width: 100%;
+  }
+
+  .header {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .nextActions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    article {
+      min-height: 230px;
+    }
+  }
+}
+
+@media (max-width: 1500px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .courseCover {
+    aspect-ratio: 16 / 9;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 900px) {
+  .nextActions,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nextActions article {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+
+    article {
+      border-radius: 12px;
+      min-height: 86px;
+      padding: 0.7rem 0.55rem;
+    }
+
+    strong {
+      font-size: 1.35rem;
+    }
+
+    span {
+      font-size: 0.68rem;
+      line-height: 1.25;
+    }
+  }
+
+  .applicationRow,
+  .applicationStatus,
+  .sectionTitle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .applicationRow {
+    display: flex;
+  }
+}
